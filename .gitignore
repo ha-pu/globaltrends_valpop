@@ -1,0 +1,14 @@
+# R files
+.Rhistory
+.Rproj.user/
+.Rproj
+
+# Intermediate data files
+data/batch_object.rds
+
+# Database file
+db
+
+# .env files
+.env
+venv
