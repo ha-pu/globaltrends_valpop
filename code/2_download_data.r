@@ -24,5 +24,11 @@ download_object(object = batch_object, control = 1, locations = gt.env$eu_plus)
 # compute score ----------------------------------------------------------------
 compute_score(object = batch_object, control = 1, locations = gt.env$eu_plus)
 
+# regional distribution --------------------------------------------------------
+download_region(object = batch_object, locations = gt.env$eu_plus)
+
+# related keywords -------------------------------------------------------------
+download_themes(object = batch_object, locations = gt.env$eu_plus)
+
 # disconnect -------------------------------------------------------------------
 disconnect_db()

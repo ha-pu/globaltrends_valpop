@@ -5,6 +5,10 @@
 
 # Intermediate data files
 data/batch_object.rds
+data/valpop_keyword.rds
+data/valpop_related.rds
+data/valpop_region.rds
+data/region_code.csv
 
 # Database file
 db

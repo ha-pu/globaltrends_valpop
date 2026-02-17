@@ -2,25 +2,32 @@
 
 # packages ---------------------------------------------------------------------
 library(globaltrends)
+library(lubridate)
 library(readxl)
 library(tidyverse)
 
 # load data --------------------------------------------------------------------
 start_db()
-score_base <- export_score(control = 1)
+data_score <- export_score(control = 1)
+data_related <- gt.env$tbl_related %>%
+    select(term, location, start_date, end_date, related_term, hits) %>%
+    collect()
+data_region <- gt.env$tbl_region %>%
+    select(-batch_o) %>%
+    collect()
 disconnect_db()
 
 data_keywords <- read_xlsx("input/valpop_topics.xlsx", sheet = 2)
 
 # aggregate by term ------------------------------------------------------------
-valpop_keyword <- score_base %>%
+valpop_keyword <- data_score %>%
     inner_join(data_keywords, by = c("keyword" = "code")) %>%
     select(
         control,
         location,
         category,
         group,
-        keyword,
+        keyword = topic,
         date,
         score
     ) %>%
@@ -43,9 +50,49 @@ valpop_keyword <- score_base %>%
     ) %>%
     select(-month, -year)
 
+# map related terms ------------------------------------------------------------
+valpop_related <- data_related %>%
+    inner_join(data_keywords, by = c("term" = "code")) %>%
+    mutate(year = year(start_date)) %>%
+    select(
+        category,
+        group,
+        keyword = topic,
+        location,
+        year,
+        related_term,
+        hits
+    )
+
+# map regions ------------------------------------------------------------------
+valpop_region <- data_region %>%
+    inner_join(data_keywords, by = c("term" = "code")) %>%
+    mutate(year = year(start_date)) %>%
+    select(
+        category,
+        group,
+        keyword = topic,
+        location,
+        year,
+        region_code,
+        region_name,
+        hits
+    )
+
 # save data --------------------------------------------------------------------
-data_keyword <- bind_rows(
+valpop_keyword <- bind_rows(
     read_rds("data/valpop_keyword.rds"),
     valpop_keyword
 )
-saveRDS(data_keyword, "data/valpop_keyword.rds")
+valpop_related <- bind_rows(
+    read_rds("data/valpop_related.rds"),
+    valpop_related
+)
+valpop_region <- bind_rows(
+    read_rds("data/valpop_region.rds"),
+    valpop_region
+)
+
+saveRDS(valpop_keyword, "data/valpop_keyword.rds")
+saveRDS(valpop_related, "data/valpop_related.rds")
+saveRDS(valpop_region, "data/valpop_region.rds")

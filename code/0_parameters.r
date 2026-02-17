@@ -6,5 +6,7 @@
 # install.packages("tidyverse")
 
 # save new year ----------------------------------------------------------------
-year <- 2025
+year <- readr::read_lines("input/new_year.txt")
+year <- as.integer(year) + 1
+if (year > 2025) stop()
 readr::write_lines(year, "input/new_year.txt")
